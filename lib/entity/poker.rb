@@ -13,6 +13,20 @@ module Entity
 
     def check_hand(player)
       case
+      when royal_staright_flush?(player.hand)
+        player.score = 10
+      when straight_flush?(player.hand)
+        player.score = 9
+      when full_house?(player.hand)
+        player.score = 8
+      when straight?(player.hand)
+        player.score = 7
+      when flush?(player.hand)
+        player.score = 6
+      when five_card?(player.hand)
+        player.score = 5
+      when four_card?(player.hand)
+        player.score = 4
       when three_card?(player.hand)
         player.score = 3
       when two_pair?(player.hand)
@@ -54,19 +68,19 @@ module Entity
     end
 
     def straight_flush?(hand)
-      false
+      straight_flush?(hand) && flush?(hand)
     end
 
     def full_house?(hand)
-      false
+      two_pair?(hand) && three_card?(hand)
     end
 
     def straight?(hand)
-      false
+      hand.map(&:number).sort.each_cons(2).all? { |a, b| a + 1 == b }
     end
 
     def flush?(hand)
-      false
+      hand.map(&:type).uniq == 1
     end
 
     def one_pair?(hand)
@@ -85,6 +99,13 @@ module Entity
       hand
         .group_by(&:number)
         .select { |_, v| v.size == 3 }
+        .length == 1
+    end
+
+    def four_card?(hand)
+      hand
+        .group_by(&:number)
+        .select { |_, v| v.size == 4 }
         .length == 1
     end
   end
